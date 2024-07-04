@@ -1,5 +1,6 @@
 package com.sajeg.arcade
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -28,7 +29,10 @@ class ApiClient(private val apiKey: String) {
             .build()
 
         val response = client.newCall(request).execute()
-
+        val code = response.code
+        if (code == 404) {
+            throw Exception("Invalid Credentials")
+        }
         val responseBody = response.body?.string() ?: throw Exception("Empty response body")
         JSONObject(responseBody)
     }

@@ -10,11 +10,11 @@ import kotlinx.serialization.Serializable
 fun SetupNavGraph(
     navController: NavHostController,
 ) {
-    NavHost(navController = navController, startDestination = Setup) {
+    NavHost(navController = navController, startDestination = SetupScreen) {
         composable<HomeScreen> {
             HomeScreen(navController)
         }
-        composable<Setup> {
+        composable<SetupScreen> {
             SetupScreen(navController)
         }
     }
@@ -24,4 +24,4 @@ fun SetupNavGraph(
 object HomeScreen
 
 @Serializable
-object Setup
+object SetupScreen
