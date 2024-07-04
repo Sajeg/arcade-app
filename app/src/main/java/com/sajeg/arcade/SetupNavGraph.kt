@@ -17,6 +17,10 @@ fun SetupNavGraph(
         composable<SetupScreen> {
             SetupScreen(navController)
         }
+
+        composable<StartApp> {
+            val apiKey
+        }
     }
 }
 
@@ -25,3 +29,6 @@ object HomeScreen
 
 @Serializable
 object SetupScreen
+
+@Serializable
+object StartApp
