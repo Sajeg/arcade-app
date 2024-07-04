@@ -42,7 +42,7 @@ fun HomeScreen(modifier: Modifier) {
         } else {
             Text(text = stats)
             LaunchedEffect(stats) {
-                api.getSession(slackId)
+                stats = api.getSession(slackId).get("sessions").toString()
             }
         }
     }
