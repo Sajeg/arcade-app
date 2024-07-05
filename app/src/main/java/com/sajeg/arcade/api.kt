@@ -7,10 +7,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 
-class ApiClient(private val apiKey: String) {
+class ApiClient(private val apiKey: String, private val slackId: String) {
     private val client = OkHttpClient()
 
-    suspend fun getSession(slackId: String): JSONObject = withContext(Dispatchers.IO) {
+    suspend fun getSession(): JSONObject = withContext(Dispatchers.IO) {
         val request = Request.Builder()
             .url("https://hackhour.hackclub.com/api/session/:$slackId")
             .header("Authorization", "Bearer $apiKey")
@@ -22,7 +22,7 @@ class ApiClient(private val apiKey: String) {
         JSONObject(responseBody)
     }
 
-    suspend fun getStats(slackId: String): JSONObject = withContext(Dispatchers.IO) {
+    suspend fun getStats(): JSONObject = withContext(Dispatchers.IO) {
         val request = Request.Builder()
             .url("https://hackhour.hackclub.com/api/stats/:$slackId")
             .header("Authorization", "Bearer $apiKey")

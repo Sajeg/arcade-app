@@ -50,10 +50,11 @@ fun SetupScreen(navController: NavController) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     inputAllowed = false
-                    val client = ApiClient(apiKeyField)
-                    client.getStats(slackIdField)
-                    setApiKey(context, apiKeyField)
-                    setSlackId(context, slackIdField)
+                    val client = ApiClient(apiKeyField, slackIdField)
+                    val viewModel = TokenViewModel()
+                    client.getStats()
+                    viewModel.setApiKey(context, apiKeyField)
+                    viewModel.setSlackId(context, slackIdField)
                     withContext(Dispatchers.Main) {
                         navController.navigate(HomeScreen)
                     }

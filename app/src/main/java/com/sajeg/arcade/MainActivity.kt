@@ -23,8 +23,6 @@ import kotlinx.coroutines.launch
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 lateinit var modifierPadding: Modifier
-lateinit var apiKey: String
-lateinit var slackId: String
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
