@@ -1,10 +1,14 @@
 package com.sajeg.arcade
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,6 +66,12 @@ fun HomeScreen(navController: NavController) {
         }
         if (session != null) {
             DisplaySession(session = session!!)
+            DisplayActions(session = session!!, api = api, onPaused = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    session = api.getSession()
+                    Log.d("Stats", stats.toString())
+                }
+            })
         }
     }
 }
@@ -150,4 +160,30 @@ fun DisplaySession(session: JSONObject) {
     )
     Text(text = "minutes remaining", modifier = Modifier.offset(y = (-60).dp, x = (-40).dp))
     Text(text = "in your current session", modifier = Modifier.offset(y = (-60).dp, x = 40.dp))
+}
+
+@Composable
+fun DisplayActions(session: JSONObject, api: ApiClient, onPaused: () -> Unit) {
+    if (!session.getJSONObject("data").getBoolean("completed")) {
+        Text(text = "What would you like to do?")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            if (session.getJSONObject("data").getBoolean("paused")) {
+                Button(onClick = { /*TODO*/ }) {
+                    Text(text = "Resume session")
+                }
+            } else {
+                Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.pause(); onPaused() } }) {
+                    Text(text = "Pause session")
+                }
+            }
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "End session")
+            }
+        }
+    }
 }

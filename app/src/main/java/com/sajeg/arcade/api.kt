@@ -3,6 +3,7 @@ package com.sajeg.arcade
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -26,6 +27,22 @@ class ApiClient(private val apiKey: String, private val slackId: String) {
         val request = Request.Builder()
             .url("https://hackhour.hackclub.com/api/stats/:$slackId")
             .header("Authorization", "Bearer $apiKey")
+            .build()
+
+        val response = client.newCall(request).execute()
+        val code = response.code
+        if (code == 404) {
+            throw Exception("Invalid Credentials")
+        }
+        val responseBody = response.body?.string() ?: throw Exception("Empty response body")
+        JSONObject(responseBody)
+    }
+
+    suspend fun pause(): JSONObject = withContext(Dispatchers.IO) {
+        val request = Request.Builder()
+            .url("https://hackhour.hackclub.com/api/pause/:$slackId")
+            .header("Authorization", "Bearer $apiKey")
+            .post(FormBody.Builder().build())
             .build()
 
         val response = client.newCall(request).execute()
