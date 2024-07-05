@@ -2,24 +2,26 @@ package com.sajeg.arcade
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sajeg.arcade.ui.theme.ArcadeTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 lateinit var modifierPadding: Modifier
@@ -33,7 +35,38 @@ class MainActivity : ComponentActivity() {
         setContent {
             ArcadeTheme {
                 navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(bottomBar = {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+                    val viewModel = TokenViewModel()
+                    if (currentDestination != null) {
+                        Log.d("DESUIH", currentDestination.route!!)
+                    }
+                    if (viewModel.getApiKey(this) != null) {
+                        NavigationBar {
+                            NavigationBarItem(
+                                selected = if (currentDestination != null) currentDestination.route == "com.sajeg.arcade.HomeScreen" || currentDestination.route == "com.sajeg.arcade.StartApp" else false,
+                                onClick = { navController.navigate(HomeScreen) },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.home),
+                                        contentDescription = ""
+                                    )
+                                }
+                            )
+                            NavigationBarItem(
+                                selected = if (currentDestination != null) currentDestination.route == "com.sajeg.arcade.SessionScreen" else false,
+                                onClick = { navController.navigate(SessionScreen) },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.alarm),
+                                        contentDescription = ""
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }, modifier = Modifier.fillMaxSize()) { innerPadding ->
                     modifierPadding = Modifier.padding(innerPadding)
                     SetupNavGraph(navController = navController)
                 }

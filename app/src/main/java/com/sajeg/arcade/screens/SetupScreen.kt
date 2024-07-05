@@ -1,4 +1,4 @@
-package com.sajeg.arcade
+package com.sajeg.arcade.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +19,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.sajeg.arcade.ApiClient
+import com.sajeg.arcade.TokenViewModel
+import com.sajeg.arcade.modifierPadding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,7 +58,7 @@ fun SetupScreen(navController: NavController) {
                     viewModel.setApiKey(context, apiKeyField)
                     viewModel.setSlackId(context, slackIdField)
                     withContext(Dispatchers.Main) {
-                        navController.navigate(HomeScreen)
+                        navController.navigate(com.sajeg.arcade.HomeScreen)
                     }
                 } catch (e: Exception) {
                     inputAllowed = true

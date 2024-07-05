@@ -1,4 +1,4 @@
-package com.sajeg.arcade
+package com.sajeg.arcade.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.sajeg.arcade.ApiClient
+import com.sajeg.arcade.TokenViewModel
+import com.sajeg.arcade.modifierPadding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,7 +69,9 @@ fun HomeScreen(navController: NavController) {
             DisplayStats(stats = stats!!)
         }
         if (session != null) {
-            DisplaySession(session = session!!)
+            if (!session!!.getJSONObject("data").getBoolean("completed")) {
+                DisplaySession(session = session!!)
+            }
             DisplayActions(session = session!!, api = api, onPaused = {
                 CoroutineScope(Dispatchers.IO).launch {
                     session = api.getSession()

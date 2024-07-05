@@ -5,6 +5,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.sajeg.arcade.screens.HomeScreen
+import com.sajeg.arcade.screens.Sessions
+import com.sajeg.arcade.screens.SetupScreen
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -18,7 +21,9 @@ fun SetupNavGraph(
         composable<SetupScreen> {
             SetupScreen(navController)
         }
-
+        composable<SessionScreen> {
+            Sessions()
+        }
         composable<StartApp> {
             val viewModel = TokenViewModel()
 
@@ -41,3 +46,6 @@ object SetupScreen
 
 @Serializable
 object StartApp
+
+@Serializable
+object SessionScreen
