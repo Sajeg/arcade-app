@@ -195,7 +195,7 @@ fun DisplayActions(session: JSONObject, api: ApiClient, onPaused: () -> Unit) {
         TextField(value = work, onValueChange = { work = it }, modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp))
-        Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.start(work) } }) {
+        Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.start(work); onPaused() } }) {
             Text(text = "Start session")
         }
     }

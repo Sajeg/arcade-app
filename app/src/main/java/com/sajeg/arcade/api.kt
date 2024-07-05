@@ -3,8 +3,10 @@ package com.sajeg.arcade
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 class ApiClient(private val apiKey: String, private val slackId: String) {
@@ -70,10 +72,16 @@ class ApiClient(private val apiKey: String, private val slackId: String) {
     }
 
     suspend fun start(work: String): JSONObject = withContext(Dispatchers.IO) {
+        val jsonBody = JSONObject().apply {
+            put("work", work)
+        }
+
+        val requestBody = jsonBody.toString().toRequestBody("application/json".toMediaType())
+
         val request = Request.Builder()
             .url("https://hackhour.hackclub.com/api/start/:$slackId")
             .header("Authorization", "Bearer $apiKey")
-            .post(FormBody.Builder().add("work", work).build())
+            .post(requestBody)
             .build()
 
         val response = client.newCall(request).execute()
