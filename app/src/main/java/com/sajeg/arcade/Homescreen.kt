@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -172,18 +173,25 @@ fun DisplayActions(session: JSONObject, api: ApiClient, onPaused: () -> Unit) {
                 .padding(20.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            if (session.getJSONObject("data").getBoolean("paused")) {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Resume session")
-                }
-            } else {
-                Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.pause(); onPaused() } }) {
-                    Text(text = "Pause session")
-                }
+            Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.pause(); onPaused() } }) {
+                Text(
+                    text = if (session.getJSONObject("data")
+                            .getBoolean("paused")
+                    ) "Resume session" else "Pause session"
+                )
             }
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.end(); onPaused() } }) {
                 Text(text = "End session")
             }
+        }
+    } else {
+        var work by remember { mutableStateOf("") }
+        Text(text = "Would you like to start a new session?")
+        TextField(value = work, onValueChange = { work = it }, modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp))
+        Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.start(work) } }) {
+            Text(text = "Start session")
         }
     }
 }
