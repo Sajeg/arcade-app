@@ -34,17 +34,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ArcadeTheme {
-                val context = LocalContext.current
-                LaunchedEffect(apiKey) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        apiKey = getApiKey(context) ?: ""
-                    }
-                }
-                LaunchedEffect(slackId) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        slackId = getSlackId(context) ?: ""
-                    }
-                }
                 navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     modifierPadding = Modifier.padding(innerPadding)

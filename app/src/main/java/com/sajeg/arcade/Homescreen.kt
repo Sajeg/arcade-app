@@ -18,6 +18,7 @@ fun HomeScreen(navController: NavController) {
     var tmpSlackId by remember { mutableStateOf("") }
     val context = LocalContext.current
     val api = ApiClient("")
+    val viewModel = TokenViewModel()
     var stats by remember { mutableStateOf("") }
 
     Column(
@@ -25,7 +26,7 @@ fun HomeScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Hi from Main")
-        Text(text = "Api: $tmpApiKey")
-        Text(text = "slack: $tmpSlackId")
+        Text(text = "Api: ${viewModel.getApiKey(LocalContext.current)}")
+        Text(text = "slack: ${viewModel.getSlackId(LocalContext.current)}")
     }
 }

@@ -33,9 +33,6 @@ fun SetupScreen(navController: NavController) {
     var errorMsg by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    if (apiKey != "" && slackId != "") {
-        navController.navigate(HomeScreen(navController = navController))
-    }
     Column(
         modifier = modifierPadding.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

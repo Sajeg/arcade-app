@@ -1,6 +1,7 @@
 package com.sajeg.arcade
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,7 +11,7 @@ import kotlinx.serialization.Serializable
 fun SetupNavGraph(
     navController: NavHostController,
 ) {
-    NavHost(navController = navController, startDestination = SetupScreen) {
+    NavHost(navController = navController, startDestination = StartApp) {
         composable<HomeScreen> {
             HomeScreen(navController)
         }
@@ -19,7 +20,15 @@ fun SetupNavGraph(
         }
 
         composable<StartApp> {
-            val apiKey
+            val viewModel = TokenViewModel()
+
+            if (viewModel.getApiKey(LocalContext.current) == "null" ||
+                viewModel.getSlackId(LocalContext.current) == "null"
+            ) {
+                SetupScreen(navController)
+            } else {
+                HomeScreen(navController)
+            }
         }
     }
 }
