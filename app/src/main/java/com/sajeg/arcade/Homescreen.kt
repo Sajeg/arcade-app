@@ -58,41 +58,96 @@ fun HomeScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (stats != null) {
-            if (stats!!.getBoolean("ok")) {
-                Text(
-                    "You have already",
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .offset(y = 20.dp)
-                        .padding(20.dp)
-                )
-                Text(
-                    stats!!.getJSONObject("data").getInt("sessions").toString(),
-                    fontSize = 72.sp,
-                    fontWeight = FontWeight.Bold,
-                    style = TextStyle(
-                        brush = Brush.linearGradient(
-                            colors =
-                            listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.tertiary,
-                                MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    )
-                )
-                Text(
-                    "sessions",
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .offset(y = (-10).dp)
-                        .padding(20.dp)
-                )
-            }
+            DisplayStats(stats = stats!!)
         }
-        Text(text = "Api: ${viewModel.getApiKey(LocalContext.current)}")
-        Text(text = "slack: ${viewModel.getSlackId(LocalContext.current)}")
+        if (session != null) {
+            DisplaySession(session = session!!)
+        }
     }
 }
 
+@Composable
+fun DisplayStats(stats: JSONObject) {
+    if (!stats.getBoolean("ok")) {
+        return
+    }
+    Text(
+        "You have already",
+        modifier = Modifier
+            .offset(y = 20.dp, x = (-100).dp)
+            .padding(20.dp)
+    )
+    Text(
+        stats.getJSONObject("data").getInt("sessions").toString(),
+        fontSize = 72.sp,
+        fontWeight = FontWeight.Bold,
+        style = TextStyle(
+            brush = Brush.linearGradient(
+                colors =
+                listOf(
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.tertiary,
+                    MaterialTheme.colorScheme.secondary
+                )
+            )
+        )
+    )
+    Text(
+        "sessions",
+        modifier = Modifier
+            .offset(y = (-10).dp, x = 100.dp)
+            .padding(20.dp)
+    )
+    Text(
+        text = "with a total of ",
+        modifier = Modifier.offset(y = (-30).dp, x = (-80).dp)
+    )
+    Text(
+        stats.getJSONObject("data").getInt("total").toString(),
+        fontSize = 72.sp,
+        modifier = Modifier.offset(y = (-20).dp),
+        fontWeight = FontWeight.Bold,
+        style = TextStyle(
+            brush = Brush.linearGradient(
+                colors =
+                listOf(
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.tertiary,
+                    MaterialTheme.colorScheme.secondary
+                )
+            )
+        )
+    )
+    Text(
+        "minutes",
+        modifier = Modifier
+            .offset(x = 50.dp, y = (-40).dp)
+            .padding(20.dp)
+    )
+}
 
+@Composable
+fun DisplaySession(session: JSONObject) {
+    if (!session.getBoolean("ok")) {
+        return
+    }
+    Text(text = "and", modifier = Modifier.offset(y = (-70).dp, x = (-100).dp))
+    Text(
+        session.getJSONObject("data").getInt("remaining").toString(),
+        fontSize = 64.sp,
+        modifier = Modifier.offset(y = (-60).dp),
+        fontWeight = FontWeight.Bold,
+        style = TextStyle(
+            brush = Brush.linearGradient(
+                colors =
+                listOf(
+                    MaterialTheme.colorScheme.secondary,
+                    MaterialTheme.colorScheme.tertiary,
+                    MaterialTheme.colorScheme.primary
+                )
+            )
+        )
+    )
+    Text(text = "minutes remaining", modifier = Modifier.offset(y = (-60).dp, x = (-40).dp))
+    Text(text = "in your current session", modifier = Modifier.offset(y = (-60).dp, x = 40.dp))
+}
