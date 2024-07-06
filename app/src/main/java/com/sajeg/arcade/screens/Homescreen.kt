@@ -8,10 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     val viewModel = TokenViewModel()
@@ -44,6 +50,15 @@ fun HomeScreen(navController: NavController) {
     val api = ApiClient(apiKey, slackId)
     var stats by remember { mutableStateOf<JSONObject?>(null) }
     var session by remember { mutableStateOf<JSONObject?>(null) }
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            stats = api.getStats()
+            session = api.getSession()
+            pullToRefreshState.endRefresh()
+        }
+    }
     if (stats == null) {
         LaunchedEffect(stats) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -61,24 +76,40 @@ fun HomeScreen(navController: NavController) {
         }
     }
 
-    Column(
-        modifier = modifierPadding.fillMaxSize(),
+    LazyColumn(
+        modifier = modifierPadding
+            .fillMaxSize()
+            .nestedScroll(pullToRefreshState.nestedScrollConnection),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (stats != null) {
-            DisplayStats(stats = stats!!)
+            item {
+                DisplayStats(stats = stats!!)
+            }
         }
         if (session != null) {
-            if (!session!!.getJSONObject("data").getBoolean("completed")) {
-                DisplaySession(session = session!!)
-            }
-            DisplayActions(session = session!!, api = api, onPaused = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    session = api.getSession()
-                    Log.d("Stats", stats.toString())
+            item {
+                if (!session!!.getJSONObject("data").getBoolean("completed")) {
+                    DisplaySession(session = session!!)
                 }
-            })
+                DisplayActions(session = session!!, api = api, onPaused = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        session = api.getSession()
+                        Log.d("Stats", stats.toString())
+                    }
+                })
+            }
         }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PullToRefreshContainer(
+            modifier = Modifier,
+            state = pullToRefreshState,
+        )
     }
 }
 
@@ -192,9 +223,14 @@ fun DisplayActions(session: JSONObject, api: ApiClient, onPaused: () -> Unit) {
     } else {
         var work by remember { mutableStateOf("") }
         Text(text = "Would you like to start a new session?")
-        TextField(value = work, onValueChange = { work = it }, modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp))
+        TextField(
+            value = work,
+            onValueChange = { work = it },
+            placeholder = { Text(text = "What would you like to work on?") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        )
         Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.start(work); onPaused() } }) {
             Text(text = "Start session")
         }

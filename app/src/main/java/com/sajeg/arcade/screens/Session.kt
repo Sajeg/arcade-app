@@ -1,19 +1,25 @@
 package com.sajeg.arcade.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +37,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Sessions() {
     val viewModel = TokenViewModel()
@@ -39,7 +46,14 @@ fun Sessions() {
         viewModel.getSlackId(LocalContext.current)!!
     )
     var sessions by remember { mutableStateOf<JSONArray?>(null) }
+    val pullToRefreshState = rememberPullToRefreshState()
 
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            sessions = api.getHistory().getJSONArray("data")
+            pullToRefreshState.endRefresh()
+        }
+    }
     if (sessions == null) {
         LaunchedEffect(sessions) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -48,11 +62,12 @@ fun Sessions() {
         }
     } else {
         LazyColumn(
-            modifier = modifierPadding
+            modifier = modifierPadding.nestedScroll(pullToRefreshState.nestedScrollConnection),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            for (i in 0..<sessions!!.length()) {
+            for (i in 1..sessions!!.length()) {
                 item {
-                    val session = sessions!![i] as JSONObject
+                    val session = sessions!![sessions!!.length() - i] as JSONObject
                     val (month, day) = getMonthAndDay(session.getString("createdAt"))
                     Card(
                         colors = CardColors(
@@ -79,6 +94,15 @@ fun Sessions() {
 
                 }
             }
+        }
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            PullToRefreshContainer(
+                modifier = Modifier,
+                state = pullToRefreshState,
+            )
         }
     }
 }
