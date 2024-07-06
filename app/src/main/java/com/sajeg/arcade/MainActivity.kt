@@ -2,7 +2,6 @@ package com.sajeg.arcade
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -39,10 +38,7 @@ class MainActivity : ComponentActivity() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
                     val viewModel = TokenViewModel()
-                    if (currentDestination != null) {
-                        Log.d("DESUIH", currentDestination.route!!)
-                    }
-                    if (viewModel.getApiKey(this) != null) {
+                    if (viewModel.getApiKey(this) != "null") {
                         NavigationBar {
                             NavigationBarItem(
                                 selected = if (currentDestination != null) currentDestination.route == "com.sajeg.arcade.HomeScreen" || currentDestination.route == "com.sajeg.arcade.StartApp" else false,
@@ -50,6 +46,16 @@ class MainActivity : ComponentActivity() {
                                 icon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.home),
+                                        contentDescription = ""
+                                    )
+                                }
+                            )
+                            NavigationBarItem(
+                                selected = if (currentDestination != null) currentDestination.route == "com.sajeg.arcade.ShopScreen" else false,
+                                onClick = { navController.navigate(ShopScreen) },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.shop),
                                         contentDescription = ""
                                     )
                                 }

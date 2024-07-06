@@ -3,6 +3,7 @@ package com.sajeg.arcade.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withContext
 fun SetupScreen(navController: NavController) {
     var apiKeyField by remember { mutableStateOf("") }
     var slackIdField by remember { mutableStateOf("") }
+    var shopLinkField by remember { mutableStateOf("") }
     var inputAllowed by remember { mutableStateOf(true) }
     var errorMsg by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -41,12 +43,33 @@ fun SetupScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(text = "Enter your ApiKey: ", modifier = Modifier.padding(15.dp))
-        TextField(value = apiKeyField, onValueChange = { apiKeyField = it }, enabled = inputAllowed)
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+            value = apiKeyField,
+            onValueChange = { apiKeyField = it },
+            singleLine = true,
+            enabled = inputAllowed
+        )
         Text(text = "Enter your SlackId: ", modifier = Modifier.padding(15.dp))
         TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
             value = slackIdField,
             onValueChange = { slackIdField = it },
             enabled = inputAllowed
+        )
+        Text(text = "Enter your Shop Link: ", modifier = Modifier.padding(15.dp))
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+            value = shopLinkField,
+            onValueChange = { shopLinkField = it },
+            enabled = inputAllowed,
+            singleLine = true
         )
         Button(onClick = {
             CoroutineScope(Dispatchers.IO).launch {
@@ -57,6 +80,7 @@ fun SetupScreen(navController: NavController) {
                     client.getStats()
                     viewModel.setApiKey(context, apiKeyField)
                     viewModel.setSlackId(context, slackIdField)
+                    viewModel.setShopLink(context, shopLinkField)
                     withContext(Dispatchers.Main) {
                         navController.navigate(com.sajeg.arcade.HomeScreen)
                     }

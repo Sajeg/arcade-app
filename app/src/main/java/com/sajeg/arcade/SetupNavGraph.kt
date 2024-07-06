@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.sajeg.arcade.screens.HomeScreen
 import com.sajeg.arcade.screens.Sessions
 import com.sajeg.arcade.screens.SetupScreen
+import com.sajeg.arcade.screens.ShopScreen
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -24,11 +25,15 @@ fun SetupNavGraph(
         composable<SessionScreen> {
             Sessions()
         }
+        composable<ShopScreen> {
+            ShopScreen()
+        }
         composable<StartApp> {
             val viewModel = TokenViewModel()
 
             if (viewModel.getApiKey(LocalContext.current) == "null" ||
-                viewModel.getSlackId(LocalContext.current) == "null"
+                viewModel.getSlackId(LocalContext.current) == "null" ||
+                viewModel.getShopLink(LocalContext.current) == "null"
             ) {
                 SetupScreen(navController)
             } else {
@@ -46,6 +51,9 @@ object SetupScreen
 
 @Serializable
 object StartApp
+
+@Serializable
+object ShopScreen
 
 @Serializable
 object SessionScreen
