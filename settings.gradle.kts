@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Arcade"
 include(":app")
- 
+include(":shared")

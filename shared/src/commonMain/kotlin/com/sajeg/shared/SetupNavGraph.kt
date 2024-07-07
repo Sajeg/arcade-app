@@ -5,10 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.sajeg.arcade.screens.HomeScreen
 import com.sajeg.arcade.screens.Sessions
-import com.sajeg.arcade.screens.SetupScreen
-import com.sajeg.arcade.screens.ShopScreen
 import kotlinx.serialization.Serializable
 
 @Composable
