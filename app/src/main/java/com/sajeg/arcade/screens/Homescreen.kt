@@ -1,6 +1,13 @@
 package com.sajeg.arcade.screens
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -246,19 +253,41 @@ fun DisplayActions(session: JSONObject, api: ApiClient, onPaused: () -> Unit) {
                 .padding(20.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.pause(); onPaused() } }) {
-                Text(
-                    text = if (session.getJSONObject("data")
-                            .getBoolean("paused")
-                    ) "Resume session" else "Pause session"
-                )
+            var loading by remember { mutableStateOf(false) }
+            AnimatedVisibility(
+                !loading,
+                enter = fadeIn() + slideInHorizontally(),
+                exit = fadeOut() + slideOutHorizontally()
+            ) {
+                Button(onClick = {
+                    loading = true; CoroutineScope(Dispatchers.IO).launch {
+                    api.pause(); onPaused(); loading = false
+                }
+                }) {
+                    Text(
+                        text = if (session.getJSONObject("data")
+                                .getBoolean("paused")
+                        ) "Resume session" else "Pause session"
+                    )
+                }
             }
-            Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.end(); onPaused() } }) {
-                Text(text = "End session")
+            AnimatedVisibility(
+                !loading,
+                enter = fadeIn() + slideInHorizontally(),
+                exit = fadeOut() + slideOutHorizontally()
+            ) {
+                Button(onClick = {
+                    loading = true; CoroutineScope(Dispatchers.IO).launch {
+                    api.end(); onPaused(); loading = false
+                }
+                }) {
+                    Text(text = "End session")
+                }
             }
         }
     } else {
         var work by remember { mutableStateOf("") }
+        var loading by remember { mutableStateOf(false) }
         Text(text = "Would you like to start a new session?")
         TextField(
             value = work,
@@ -268,8 +297,21 @@ fun DisplayActions(session: JSONObject, api: ApiClient, onPaused: () -> Unit) {
                 .fillMaxWidth()
                 .padding(20.dp)
         )
-        Button(onClick = { CoroutineScope(Dispatchers.IO).launch { api.start(work); onPaused() } }) {
-            Text(text = "Start session")
+        AnimatedVisibility(
+            !loading,
+            enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically()
+        ) {
+            Button(onClick = {
+                loading = true
+                CoroutineScope(Dispatchers.IO).launch {
+                    api.start(
+                        work
+                    ); onPaused(); loading = false
+                }
+            }) {
+                Text(text = "Start session")
+            }
         }
     }
 }
