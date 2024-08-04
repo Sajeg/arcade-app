@@ -29,6 +29,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -50,28 +51,46 @@ fun HomeScreen(navController: NavController) {
     val api = ApiClient(apiKey, slackId)
     var stats by remember { mutableStateOf<JSONObject?>(null) }
     var session by remember { mutableStateOf<JSONObject?>(null) }
+    var error by remember { mutableStateOf(false) }
+    var color = MaterialTheme.colorScheme.error
     val pullToRefreshState = rememberPullToRefreshState()
 
     if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(true) {
-            stats = api.getStats()
-            session = api.getSession()
-            pullToRefreshState.endRefresh()
-        }
-    }
-    if (stats == null) {
-        LaunchedEffect(stats) {
-            CoroutineScope(Dispatchers.IO).launch {
+            try {
                 stats = api.getStats()
-                Log.d("Stats", stats.toString())
+                session = api.getSession()
+                error = false
+                pullToRefreshState.endRefresh()
+            } catch (e: Exception) {
+                stats = null
+                session = null
+                error = true
+                pullToRefreshState.endRefresh()
             }
         }
     }
-    if (session == null) {
+    if (stats == null && !error) {
+        LaunchedEffect(stats) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    stats = api.getStats()
+                    Log.d("Stats", stats.toString())
+                } catch (e: Exception) {
+                    error = true
+                }
+            }
+        }
+    }
+    if (session == null && !error) {
         LaunchedEffect(session) {
             CoroutineScope(Dispatchers.IO).launch {
-                session = api.getSession()
-                Log.d("Session", session.toString())
+                try {
+                    session = api.getSession()
+                    Log.d("Session", session.toString())
+                } catch (e: Exception) {
+                    error = true
+                }
             }
         }
     }
@@ -99,6 +118,24 @@ fun HomeScreen(navController: NavController) {
                     }
                 })
             }
+        }
+    }
+    if (error) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "Error fetching the data.\nAre you connected to the Internet?",
+                fontSize = 32.sp,
+                modifier = Modifier.padding(10.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                style = TextStyle(
+                    color
+                )
+            )
         }
     }
 
